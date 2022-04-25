@@ -1,26 +1,53 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
 
-function App() {
+import "bootstrap/dist/css/bootstrap.min.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+
+import { Home, NavBar, RandomUsers, Artist, CoinMarket} from "./vue";
+
+import {  useDispatch } from "react-redux";
+import { addinfo } from "./store/redux";
+
+
+
+const App: React.FC = () => {
+
+  const [items, setItems] = useState<[]>([]);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    fetch(
+      "https://newsapi.org/v2/top-headlines?country=fr&apiKey=61abc27d0bd247d487ccba2b437618dc"
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        dispatch(addinfo(result.articles));
+      });
+
+      fetch(
+        "https://randomuser.me/api/"
+      )
+        .then((res) => res.json())
+        .then((result) => {
+          setItems(result.results);
+        });
+  }, []);
+  
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      
+        <BrowserRouter>
+          <NavBar />
+          <Routes>
+            <Route path="/" element={<Home/>} />
+            <Route path="/randomUsers" element={<RandomUsers items={items}/>} />
+            <Route path="/artist" element={<Artist/>} />
+            <Route path="/coinmarket" element={<CoinMarket/>} />
+          </Routes>
+        </BrowserRouter>
+    
     </div>
   );
-}
+};
 
 export default App;
